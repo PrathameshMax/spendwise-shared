@@ -1,0 +1,37 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # server-id "github" matches <distributionManagement><repository><id> in pom.xml;
+      # setup-java writes a settings.xml that logs in as GITHUB_ACTOR with GITHUB_TOKEN.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          server-id: github
+
+      - name: Tag must equal the POM version
+        run: |
+          POM_VERSION=$(./mvnw -B -q help:evaluate -Dexpression=project.version -DforceStdout)
+          if [ "v${POM_VERSION}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match pom.xml version ${POM_VERSION}"
+            exit 1
+          fi
+
+      - name: Publish to GitHub Packages
+        run: ./mvnw -B -ntp deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -6,23 +6,33 @@
 
     <groupId>com.spendwise</groupId>
     <artifactId>spendwise-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>SpendWise :: Parent</name>
-    <description>Milestone 1 — unified Maven BOM and monorepo reactor for the SpendWise platform</description>
+    <description>Parent POM and BOM for every SpendWise service repository, plus the shared
+        libraries spendwise-common and spendwise-events. Released as one version and
+        published to GitHub Packages; each service repo pins the release it uses.</description>
 
+    <scm>
+        <url>https://github.com/PrathameshMax/spendwise-shared</url>
+        <connection>scm:git:https://github.com/PrathameshMax/spendwise-shared.git</connection>
+    </scm>
+
+    <!-- Polyrepo — the target of `mvn deploy` (release workflow). The id "github"
+         must match the <server> id in settings.xml that holds the token. -->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/PrathameshMax/spendwise-shared</url>
+        </repository>
+    </distributionManagement>
+
+    <!-- Polyrepo — only the shared libraries are built here. Modules are not
+         inherited, so service repos that use this POM as parent are unaffected. -->
     <modules>
         <module>spendwise-common</module>
         <module>spendwise-events</module>
-        <module>discovery-server</module>
-        <module>config-server</module>
-        <module>auth-service</module>
-        <module>user-service</module>
-        <module>transaction-service</module>
-        <module>budget-service</module>
-        <module>notification-service</module>
-        <module>analytics-service</module>
-        <module>api-gateway</module>
     </modules>
 
     <properties>
@@ -34,7 +44,9 @@
 
         <spring-boot.version>3.4.1</spring-boot.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
-        <spendwise-common.version>1.0.0-SNAPSHOT</spendwise-common.version>
+        <!-- Polyrepo — explicit, not ${project.version}: in a service that inherits
+             this POM, ${project.version} would be the service's own version. -->
+        <spendwise-common.version>1.0.0</spendwise-common.version>
         <!-- Not part of spring-boot-dependencies' BOM, so pinned explicitly here (Milestone 7) -->
         <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
         <!-- Not part of spring-boot-dependencies' BOM either, so pinned explicitly here
@@ -88,7 +100,7 @@
              match the avro runtime that reads the classes it generates.
              kafka-avro-serializer declares Kafka itself as "provided", so the
              kafka-clients version stays the one Spring Boot manages. -->
-        <spendwise-events.version>1.0.0-SNAPSHOT</spendwise-events.version>
+        <spendwise-events.version>1.0.0</spendwise-events.version>
         <confluent.version>7.9.8</confluent.version>
         <avro.version>1.11.5</avro.version>
     </properties>
