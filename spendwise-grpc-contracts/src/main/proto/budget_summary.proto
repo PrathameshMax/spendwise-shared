@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+// Milestone 15 — the Protobuf contract for the gRPC mirror of
+// BudgetController's `GET /api/v1/budgets/summary` REST endpoint, used for the
+// roadmap's "low-latency, high-throughput internal query" from analytics-service.
+//
+// Phase 6 (polyrepo) — owned here, in one place. budget-service (server) and
+// analytics-service (client) used to compile their own copies, kept in sync by
+// hand; both now depend on com.spendwise:spendwise-grpc-contracts, built from
+// this file. Changes are checked by `buf breaking` against the last release
+// before they can be published: renumbering, retyping or removing a field, or
+// removing an RPC, would break whichever side is still on the older version.
+package spendwise.grpc.budget;
+
+option java_multiple_files = true;
+option java_package = "com.spendwise.grpc.budget";
+
+// Mirrors BudgetController's own path/query parameters exactly
+// (userId path variable, periodMonth query parameter).
+message BudgetSummaryRequest {
+  string user_id = 1;
+  string period_month = 2; // "yyyy-MM", same format BudgetController's own @DateTimeFormat uses
+}
+
+// Mirrors BudgetResponse field-for-field. Monetary amounts are encoded as
+// `string` (exact decimal text, e.g. "150.00"), never a numeric protobuf
+// type: a `double`/`float` would silently reintroduce binary floating-point
+// rounding error for currency, and protobuf has no native decimal/BigDecimal
+// type — the same reasoning this platform never uses a float for money
+// anywhere else. This also keeps the REST-vs-gRPC payload comparison
+// honest: both wire formats encode the same amount as text, so the
+// benchmark measures encoding/transport efficiency, not a format change.
+message BudgetSummaryItem {
+  string id = 1;
+  string user_id = 2;
+  string category = 3;
+  string capped_amount = 4;
+  string current_spend = 5;
+  string period_month = 6;
+  string created_at = 7; // ISO-8601, matching Jackson's default Instant serialization
+}
+
+message BudgetSummaryResponse {
+  repeated BudgetSummaryItem items = 1;
+}
+
+service BudgetSummaryService {
+  rpc GetSummary(BudgetSummaryRequest) returns (BudgetSummaryResponse);
+}

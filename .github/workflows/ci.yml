@@ -20,5 +20,34 @@ jobs:
           java-version: '21'
           cache: maven
 
+      # Includes ReleasedSchemaCompatibilityTest: every Avro contract must stay
+      # FULL_TRANSITIVE compatible with every released version.
       - name: Build and test
         run: ./mvnw -B -ntp verify
+
+  # The gRPC contract's equivalent of the Avro gate: compare the .proto files with
+  # the last released tag, so a change that would break the server or a client
+  # still on that release fails here instead of in production.
+  proto-breaking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install buf
+        run: |
+          curl -sSL "https://github.com/bufbuild/buf/releases/download/v1.47.2/buf-Linux-x86_64" -o "$RUNNER_TEMP/buf"
+          chmod +x "$RUNNER_TEMP/buf"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+
+      - name: No breaking change against the last release
+        run: |
+          DIR=spendwise-grpc-contracts/src/main/proto
+          LAST=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)
+          if [ -z "$LAST" ] || ! git cat-file -e "$LAST:$DIR/buf.yaml" 2>/dev/null; then
+            echo "::notice::No released gRPC contract to compare with yet (last tag: ${LAST:-none}); skipping."
+            exit 0
+          fi
+          echo "Comparing $DIR with release $LAST"
+          buf breaking "$DIR" --against ".git#tag=$LAST,subdir=$DIR"

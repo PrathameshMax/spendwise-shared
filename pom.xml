@@ -6,11 +6,11 @@
 
     <groupId>com.spendwise</groupId>
     <artifactId>spendwise-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
     <name>SpendWise :: Parent</name>
     <description>Parent POM and BOM for every SpendWise service repository, plus the shared
-        libraries spendwise-common and spendwise-events. Released as one version and
+        libraries spendwise-common, spendwise-events and spendwise-grpc-contracts. Released as one version and
         published to GitHub Packages; each service repo pins the release it uses.</description>
 
     <scm>
@@ -33,6 +33,7 @@
     <modules>
         <module>spendwise-common</module>
         <module>spendwise-events</module>
+        <module>spendwise-grpc-contracts</module>
     </modules>
 
     <properties>
@@ -46,7 +47,7 @@
         <spring-cloud.version>2024.0.0</spring-cloud.version>
         <!-- Polyrepo — explicit, not ${project.version}: in a service that inherits
              this POM, ${project.version} would be the service's own version. -->
-        <spendwise-common.version>1.0.0</spendwise-common.version>
+        <spendwise-common.version>1.1.0</spendwise-common.version>
         <!-- Not part of spring-boot-dependencies' BOM, so pinned explicitly here (Milestone 7) -->
         <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
         <!-- Not part of spring-boot-dependencies' BOM either, so pinned explicitly here
@@ -100,7 +101,11 @@
              match the avro runtime that reads the classes it generates.
              kafka-avro-serializer declares Kafka itself as "provided", so the
              kafka-clients version stays the one Spring Boot manages. -->
-        <spendwise-events.version>1.0.0</spendwise-events.version>
+        <spendwise-events.version>1.1.0</spendwise-events.version>
+        <!-- Phase 6 — the gRPC contract (budget_summary.proto) and its generated stubs,
+             compiled once here instead of from two hand-synchronised copies in
+             budget-service (server) and analytics-service (client). -->
+        <spendwise-grpc-contracts.version>1.1.0</spendwise-grpc-contracts.version>
         <confluent.version>7.9.8</confluent.version>
         <avro.version>1.11.5</avro.version>
     </properties>
@@ -141,6 +146,11 @@
                 <groupId>com.spendwise</groupId>
                 <artifactId>spendwise-events</artifactId>
                 <version>${spendwise-events.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.spendwise</groupId>
+                <artifactId>spendwise-grpc-contracts</artifactId>
+                <version>${spendwise-grpc-contracts.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.avro</groupId>
