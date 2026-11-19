@@ -35,7 +35,7 @@ message BudgetSummaryItem {
   string user_id = 2;
   string category = 3;
   string capped_amount = 4;
-  string current_spend = 5;
+  string current_spend = 9;
   string period_month = 6;
   string created_at = 7; // ISO-8601, matching Jackson's default Instant serialization
 }
