@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpHeaders;
 
 /**
  * Hop ③ — every servlet microservice is an OAuth2 Resource Server and validates
@@ -83,7 +84,10 @@ public class SpendwiseResourceServerAutoConfiguration {
             throws Exception {
         String[] publicPaths = properties.getPublicPaths().toArray(String[]::new);
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.requireCsrfProtectionMatcher(request -> CsrfPolicy.requiresCsrfProtection(
+                        request.getMethod(),
+                        request.getHeader(HttpHeaders.COOKIE) != null,
+                        request.getHeader(HttpHeaders.AUTHORIZATION))))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
