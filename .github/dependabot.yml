@@ -1,5 +1,10 @@
 # Dependency updates arrive as pull requests and go through the full pipeline
 # (SCA and image scans included) like any other change.
+#
+# Major versions are ignored: Spring Boot 4 / Spring Cloud 2025.1 / Confluent 8 /
+# Testcontainers 2 and the like are a planned platform migration, not a weekly
+# update. Minor and patch updates (and their security fixes) keep flowing.
+# Remove the ignore block when that migration starts.
 version: 2
 
 updates:
@@ -9,6 +14,9 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       spring:
         patterns: ["org.springframework*"]
