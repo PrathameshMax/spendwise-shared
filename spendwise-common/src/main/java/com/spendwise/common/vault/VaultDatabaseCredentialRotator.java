@@ -179,9 +179,9 @@ public class VaultDatabaseCredentialRotator implements LeaseListener, LeaseError
             pool.softEvictConnections();
         }
 
-        log.info("vault.db.credentials.rotated path={} pool={} user={} lease={} ttl={}s - idle connections "
+        log.info("vault.db.credentials.rotated path={} pool={} lease={} ttl={}s - idle connections "
                         + "evicted, busy connections retire when returned", credentialsPath, hikari.getPoolName(),
-                newUsername, leaseId(event.getLease()), ttlSeconds(event.getLease()));
+                leaseId(event.getLease()), ttlSeconds(event.getLease()));
     }
 
     private HikariDataSource hikariDataSource() {
