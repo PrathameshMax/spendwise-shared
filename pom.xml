@@ -44,7 +44,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <spring-boot.version>3.5.16</spring-boot.version>
-        <spring-cloud.version>2025.0.3</spring-cloud.version>
+        <spring-cloud.version>2025.1.4</spring-cloud.version>
         <!-- Polyrepo — explicit, not ${project.version}: in a service that inherits
              this POM, ${project.version} would be the service's own version. -->
         <spendwise-common.version>1.2.0</spendwise-common.version>
