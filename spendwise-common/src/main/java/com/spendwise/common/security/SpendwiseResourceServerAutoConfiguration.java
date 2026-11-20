@@ -83,7 +83,7 @@ public class SpendwiseResourceServerAutoConfiguration {
             throws Exception {
         String[] publicPaths = properties.getPublicPaths().toArray(String[]::new);
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.requireCsrfProtectionMatcher(new CookieCsrfRequestMatcher()))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)

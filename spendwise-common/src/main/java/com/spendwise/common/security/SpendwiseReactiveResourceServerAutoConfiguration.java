@@ -65,7 +65,7 @@ public class SpendwiseReactiveResourceServerAutoConfiguration {
                                                                             SpendwiseResourceServerProperties properties) {
         String[] publicPaths = properties.getPublicPaths().toArray(String[]::new);
         http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .csrf(csrf -> csrf.requireCsrfProtectionMatcher(new CookieCsrfServerWebExchangeMatcher()))
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
