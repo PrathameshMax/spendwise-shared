@@ -4,19 +4,34 @@ on:
   push:
     tags: ['v*']
 
-permissions:
-  contents: read
-  packages: write
+permissions: {}
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # A release must be a commit that already passed the main-branch pipeline,
+      # never a tag pushed on a side branch.
+      - name: Tagged commit is on main
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::${GITHUB_REF_NAME} (${GITHUB_SHA}) is not on main"
+            exit 1
+          fi
 
       # server-id "github" matches <distributionManagement><repository><id> in pom.xml;
       # setup-java writes a settings.xml that logs in as GITHUB_ACTOR with GITHUB_TOKEN.
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
           java-version: '21'

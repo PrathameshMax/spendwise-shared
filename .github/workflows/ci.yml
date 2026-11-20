@@ -5,39 +5,54 @@ on:
     branches: [main]
   pull_request:
 
-permissions:
-  contents: read
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-
-      # Includes ReleasedSchemaCompatibilityTest: every Avro contract must stay
-      # FULL_TRANSITIVE compatible with every released version.
-      - name: Build and test
-        run: ./mvnw -B -ntp verify
+  # Stages from PrathameshMax/spendwise-ci (java-service.yml) without the image:
+  # secret scan, CodeQL, unit tests with coverage, SonarCloud quality gate,
+  # dependency SBOM scan. The unit tests include ReleasedSchemaCompatibilityTest:
+  # every Avro contract must stay FULL_TRANSITIVE compatible with every release.
+  pipeline:
+    uses: PrathameshMax/spendwise-ci/.github/workflows/java-service.yml@v1
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      packages: write
+      id-token: write
+      attestations: write
+      security-events: write
+    with:
+      image-name: ''
+      maven-settings: ''
+      # Baseline mode: coverage is measured and reported but not yet enforced.
+      # Set this to the figure in the first run's summary, then only raise it.
+      coverage-min: 0
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   # The gRPC contract's equivalent of the Avro gate: compare the .proto files with
   # the last released tag, so a change that would break the server or a client
   # still on that release fails here instead of in production.
   proto-breaking:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Install buf
         run: |
-          curl -sSL "https://github.com/bufbuild/buf/releases/download/v1.47.2/buf-Linux-x86_64" -o "$RUNNER_TEMP/buf"
+          curl -sSLf "https://github.com/bufbuild/buf/releases/download/v1.47.2/buf-Linux-x86_64" -o "$RUNNER_TEMP/buf"
+          echo "3a0c4da8d46eea8136affa63db202c76a44f8112384160b73c3fffb1cf14b5d8  $RUNNER_TEMP/buf" | sha256sum --check --strict
           chmod +x "$RUNNER_TEMP/buf"
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
 

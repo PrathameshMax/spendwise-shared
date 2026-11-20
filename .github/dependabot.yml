@@ -1,0 +1,32 @@
+# Dependency updates arrive as pull requests and go through the full pipeline
+# (SCA and image scans included) like any other change.
+version: 2
+
+updates:
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      spring:
+        patterns: ["org.springframework*"]
+      spendwise:
+        patterns: ["com.spendwise*"]
+      everything-else:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    commit-message:
+      prefix: build
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
