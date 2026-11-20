@@ -106,7 +106,7 @@
              compiled once here instead of from two hand-synchronised copies in
              budget-service (server) and analytics-service (client). -->
         <spendwise-grpc-contracts.version>1.2.0</spendwise-grpc-contracts.version>
-        <confluent.version>7.9.8</confluent.version>
+        <confluent.version>8.4.1</confluent.version>
         <avro.version>1.11.5</avro.version>
     </properties>
 
