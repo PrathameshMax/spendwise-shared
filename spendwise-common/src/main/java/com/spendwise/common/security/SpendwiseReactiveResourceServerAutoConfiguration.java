@@ -19,10 +19,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
-
 /**
  * WebFlux twin of {@link SpendwiseResourceServerAutoConfiguration} (analytics-service).
  * Backs off entirely when the application defines its own
@@ -69,16 +65,7 @@ public class SpendwiseReactiveResourceServerAutoConfiguration {
                                                                             SpendwiseResourceServerProperties properties) {
         String[] publicPaths = properties.getPublicPaths().toArray(String[]::new);
         http
-                .csrf(csrf -> csrf.requireCsrfProtectionMatcher(exchange -> {
-                    ServerHttpRequest request = exchange.getRequest();
-                    boolean required = CsrfPolicy.requiresCsrfProtection(
-                            request.getMethod().name(),
-                            request.getHeaders().containsKey(HttpHeaders.COOKIE),
-                            request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
-                    return required
-                            ? ServerWebExchangeMatcher.MatchResult.match()
-                            : ServerWebExchangeMatcher.MatchResult.notMatch();
-                }))
+                .csrf(csrf -> csrf.requireCsrfProtectionMatcher(new CookieCsrfServerWebExchangeMatcher()))
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
