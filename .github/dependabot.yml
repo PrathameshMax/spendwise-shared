@@ -17,6 +17,14 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Spring Cloud release trains are calendar-versioned: 2025.1 is the Spring Boot 4
+      # train, which semver reads as a minor bump. Comes with the Boot 4 migration.
+      - dependency-name: "org.springframework.cloud:spring-cloud-dependencies"
+        versions: [ ">=2025.1.0" ]
+      # Avro must stay on the version Confluent's serializer is built against
+      # (spendwise-parent pom.xml); minor/major moves happen together with Confluent.
+      - dependency-name: "org.apache.avro:*"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
     groups:
       spring:
         patterns: ["org.springframework*"]
