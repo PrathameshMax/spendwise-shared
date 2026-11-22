@@ -6,7 +6,7 @@
 
     <groupId>com.spendwise</groupId>
     <artifactId>spendwise-parent</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <packaging>pom</packaging>
     <name>SpendWise :: Parent</name>
     <description>Parent POM and BOM for every SpendWise service repository, plus the shared
@@ -47,7 +47,7 @@
         <spring-cloud.version>2025.0.3</spring-cloud.version>
         <!-- Polyrepo — explicit, not ${project.version}: in a service that inherits
              this POM, ${project.version} would be the service's own version. -->
-        <spendwise-common.version>1.2.2</spendwise-common.version>
+        <spendwise-common.version>1.2.3</spendwise-common.version>
         <!-- Not part of spring-boot-dependencies' BOM, so pinned explicitly here (Milestone 7) -->
         <springdoc-openapi.version>2.10.0</springdoc-openapi.version>
         <!-- Not part of spring-boot-dependencies' BOM either, so pinned explicitly here
@@ -101,11 +101,11 @@
              match the avro runtime that reads the classes it generates.
              kafka-avro-serializer declares Kafka itself as "provided", so the
              kafka-clients version stays the one Spring Boot manages. -->
-        <spendwise-events.version>1.2.2</spendwise-events.version>
+        <spendwise-events.version>1.2.3</spendwise-events.version>
         <!-- Phase 6 — the gRPC contract (budget_summary.proto) and its generated stubs,
              compiled once here instead of from two hand-synchronised copies in
              budget-service (server) and analytics-service (client). -->
-        <spendwise-grpc-contracts.version>1.2.2</spendwise-grpc-contracts.version>
+        <spendwise-grpc-contracts.version>1.2.3</spendwise-grpc-contracts.version>
         <confluent.version>7.9.11</confluent.version>
         <avro.version>1.11.5</avro.version>
     </properties>
@@ -254,6 +254,20 @@
                 <version>42.7.12</version>
             </dependency>
 
+            <!-- Resilience4j as a BOM, before spring-boot-dependencies and
+     spring-cloud-dependencies on purpose. Pinning only resilience4j-spring-boot3
+     left its transitive modules (resilience4j-spring6, -circuitbreaker, ...) on
+     the older version Spring Cloud's BOM manages; spring-boot3 2.4.0 against
+     spring6 from an older release fails at startup with NoClassDefFoundError
+     io/github/resilience4j/spring6/fallback/RxJava3FallbackDecorator. -->
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-bom</artifactId>
+                <version>${resilience4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -312,11 +326,6 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.resilience4j</groupId>
-                <artifactId>resilience4j-spring-boot3</artifactId>
-                <version>${resilience4j.version}</version>
             </dependency>
             <!-- Milestone 15 — imported (not just a single artifact version pinned) because
                  grpc-protobuf/grpc-stub/grpc-services/grpc-netty-shaded must all resolve to
