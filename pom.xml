@@ -6,7 +6,7 @@
 
     <groupId>com.spendwise</groupId>
     <artifactId>spendwise-parent</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <packaging>pom</packaging>
     <name>SpendWise :: Parent</name>
     <description>Parent POM and BOM for every SpendWise service repository, plus the shared
@@ -47,7 +47,7 @@
         <spring-cloud.version>2025.0.3</spring-cloud.version>
         <!-- Polyrepo — explicit, not ${project.version}: in a service that inherits
              this POM, ${project.version} would be the service's own version. -->
-        <spendwise-common.version>1.2.0</spendwise-common.version>
+        <spendwise-common.version>1.2.1</spendwise-common.version>
         <!-- Not part of spring-boot-dependencies' BOM, so pinned explicitly here (Milestone 7) -->
         <springdoc-openapi.version>2.10.0</springdoc-openapi.version>
         <!-- Not part of spring-boot-dependencies' BOM either, so pinned explicitly here
@@ -101,11 +101,11 @@
              match the avro runtime that reads the classes it generates.
              kafka-avro-serializer declares Kafka itself as "provided", so the
              kafka-clients version stays the one Spring Boot manages. -->
-        <spendwise-events.version>1.2.0</spendwise-events.version>
+        <spendwise-events.version>1.2.1</spendwise-events.version>
         <!-- Phase 6 — the gRPC contract (budget_summary.proto) and its generated stubs,
              compiled once here instead of from two hand-synchronised copies in
              budget-service (server) and analytics-service (client). -->
-        <spendwise-grpc-contracts.version>1.2.0</spendwise-grpc-contracts.version>
+        <spendwise-grpc-contracts.version>1.2.1</spendwise-grpc-contracts.version>
         <confluent.version>7.9.11</confluent.version>
         <avro.version>1.11.5</avro.version>
     </properties>
@@ -164,6 +164,73 @@
                 <groupId>org.xerial.snappy</groupId>
                 <artifactId>snappy-java</artifactId>
                 <version>1.1.10.12</version>
+            </dependency>
+
+            <!-- Overrides of versions spring-boot-dependencies 3.5.16 pins, declared
+     before it on purpose (first declaration wins; an imported BOM's properties
+     such as tomcat.version cannot be overridden from here). Drop each entry once
+     spring-boot.version manages the same or a newer version. -->
+
+            <!-- Tomcat 10.1.55: CVE-2026-55276, CVE-2026-65182, CVE-2026-65637,
+     CVE-2026-65905, CVE-2026-68525 (CRITICAL), CVE-2026-53404 (HIGH).
+     10.1.59 is the lowest release that fixes all six. -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>10.1.59</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-el</artifactId>
+                <version>10.1.59</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>10.1.59</version>
+            </dependency>
+
+            <!-- HttpCore 5.3.6: CVE-2026-54399, CVE-2026-54428 (HIGH, DoS via headers).
+     Pulled in by httpclient5; 5.4.x keeps the 5.x API (minor release). -->
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>5.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-h2</artifactId>
+                <version>5.4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5-reactive</artifactId>
+                <version>5.4.3</version>
+            </dependency>
+
+            <!-- Bouncy Castle 1.80.x: CVE-2026-8763 (CRITICAL), CVE-2026-13506 (HIGH).
+     Transitive, not in the Boot BOM. The three jars must stay on one version. -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.85</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>1.85</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
+                <version>1.85</version>
+            </dependency>
+
+            <!-- pgjdbc 42.7.11: CVE-2026-54291 (HIGH, SCRAM-SHA-256-PLUS downgrade). -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.12</version>
             </dependency>
 
             <dependency>
