@@ -49,7 +49,7 @@
              this POM, ${project.version} would be the service's own version. -->
         <spendwise-common.version>1.2.3</spendwise-common.version>
         <!-- Not part of spring-boot-dependencies' BOM, so pinned explicitly here (Milestone 7) -->
-        <springdoc-openapi.version>2.10.0</springdoc-openapi.version>
+        <springdoc-openapi.version>2.10.1</springdoc-openapi.version>
         <!-- Not part of spring-boot-dependencies' BOM either, so pinned explicitly here
              (Milestone 8) — used for compile-time-checked entity-to-response-DTO mapping. -->
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -70,7 +70,7 @@
              real `mvn compile` runs (no Maven Central access in the build sandbox this
              milestone was authored in — see budget-service/analytics-service pom.xml
              comments for what that does and does not mean for validation). -->
-        <grpc.version>1.85.1</grpc.version>
+        <grpc.version>1.86.0</grpc.version>
         <protobuf.version>3.25.5</protobuf.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
         <os-maven-plugin.version>1.7.1</os-maven-plugin.version>
@@ -251,7 +251,7 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>42.7.14</version>
+                <version>42.7.15</version>
             </dependency>
 
             <!-- Resilience4j as a BOM, before spring-boot-dependencies and
