@@ -10,6 +10,8 @@ version: 2
 updates:
   - package-ecosystem: maven
     directory: /
+    # Paused: no version-update PRs until this line and the next are removed.
+    open-pull-requests-limit: 0
     schedule:
       interval: weekly
       day: monday
@@ -37,6 +39,8 @@ updates:
 
   - package-ecosystem: github-actions
     directory: /
+    # Paused: no version-update PRs until this line and the next are removed.
+    open-pull-requests-limit: 0
     schedule:
       interval: weekly
       day: monday
