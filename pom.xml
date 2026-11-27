@@ -6,7 +6,7 @@
 
     <groupId>com.spendwise</groupId>
     <artifactId>spendwise-parent</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <packaging>pom</packaging>
     <name>SpendWise :: Parent</name>
     <description>Parent POM and BOM for every SpendWise service repository, plus the shared
@@ -306,6 +306,19 @@
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-avro-serializer</artifactId>
                 <version>${confluent.version}</version>
+                <exclusions>
+                    <!-- Confluent's schema-registry client brings the javax build of the
+                         swagger annotations (io.swagger.core.v3:swagger-annotations). springdoc
+                         uses the jakarta build (swagger-annotations-jakarta): different artifactId,
+                         same classes, so both land on the classpath and the older Parameter
+                         class wins, breaking /v3/api-docs with NoSuchMethodError
+                         (Parameter.validationGroups). The client only uses them as annotations on
+                         its REST entity classes, which the JVM ignores when the class is absent. -->
+                    <exclusion>
+                        <groupId>io.swagger.core.v3</groupId>
+                        <artifactId>swagger-annotations</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
