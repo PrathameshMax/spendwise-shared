@@ -37,10 +37,17 @@ jobs:
           java-version: '21'
           cache: maven
           server-id: github
-
+      # The project version is the first <version> in the parent pom.xml
+      # (spendwise-parent has no <parent> block above it). Read it from the file:
+      # no Maven run, so it cannot fail for reasons unrelated to the check.
       - name: Tag must equal the POM version
         run: |
-          POM_VERSION=$(./mvnw -B -q help:evaluate -Dexpression=project.version -DforceStdout)
+          POM_VERSION=$(sed -n 's|^[[:space:]]*<version>\([^<]*\)</version>.*|\1|p' pom.xml | head -n 1)
+          echo "pom.xml version: ${POM_VERSION:-<none>}, tag: ${GITHUB_REF_NAME}"
+          if [ -z "$POM_VERSION" ]; then
+            echo "::error::Could not read <version> from pom.xml"
+            exit 1
+          fi
           if [ "v${POM_VERSION}" != "${GITHUB_REF_NAME}" ]; then
             echo "::error::Tag ${GITHUB_REF_NAME} does not match pom.xml version ${POM_VERSION}"
             exit 1
